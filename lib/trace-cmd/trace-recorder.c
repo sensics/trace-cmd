@@ -28,10 +28,12 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <pthread.h>
+#define __USE_GNU 1
 #include <fcntl.h>
 #include <unistd.h>
 #include <ctype.h>
 #include <errno.h>
+#include <sys/syscall.h>
 
 #include "trace-cmd.h"
 #include "event-utils.h"
@@ -40,6 +42,27 @@
 #ifndef F_GETPIPE_SZ
 # define F_GETPIPE_SZ	1032 /* The Linux number for the option */
 #endif
+
+#ifdef __ANDROID__
+#include <asm/unistd.h>
+#include <sys/syscall.h>
+#define SPLICE_F_MOVE      (0x01)
+#define SPLICE_F_NONBLOCK  (0x02)
+#define SPLICE_F_MORE      (0x04)
+#define SPLICE_F_GIFT      (0x08)
+static inline ssize_t splice(int fd_in, loff_t *off_in, int fd_out,
+                         loff_t *off_out, size_t len, unsigned int flags)
+{
+   return syscall(__NR_splice,fd_in,off_in,fd_out,off_out,len,flags);
+}
+#include <linux/fs.h>
+#include <linux/fadvise.h>
+#define POSIX_FADV_DONTNEED 0
+static inline int posix_fadvise(int fd, off_t offset, off_t len, int advice)
+{
+       return -ENOSYS;
+}
+#endif /* __ANDROID__ */
 
 struct tracecmd_recorder {
 	int		fd;
