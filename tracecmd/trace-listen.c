@@ -77,6 +77,8 @@ static void put_temp_file(char *file)
 	free(file);
 }
 
+typedef void (*sighandler_t)(int);
+
 static void signal_setup(int sig, sighandler_t handle)
 {
 	struct sigaction action;
