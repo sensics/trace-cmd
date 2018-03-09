@@ -95,7 +95,7 @@ static int write_record(struct tracecmd_input *handle,
 	unsigned long long diff;
 	struct pevent *pevent;
 	void *page;
-	int len;
+	int len = 0;
 	char *ptr;
 	int index = 0;
 	int time;
