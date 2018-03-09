@@ -21,6 +21,7 @@
 #define __TRACE_LOCAL_H
 
 #include <sys/types.h>
+#include <sys/time.h>
 #include <dirent.h>	/* for DIR */
 
 #include "trace-cmd.h"
