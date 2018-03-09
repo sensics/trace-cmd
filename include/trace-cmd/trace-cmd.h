@@ -24,7 +24,9 @@
 
 #define ARRAY_SIZE(_a) (sizeof(_a) / sizeof((_a)[0]))
 #define __weak __attribute__((weak))
+#ifndef __noreturn
 #define __noreturn __attribute__((noreturn))
+#endif
 
 #define TRACECMD_ERR_MSK	((unsigned long)(-1) & ~((1UL << 14) - 1))
 #define TRACECMD_ISERR(ptr)	((unsigned long)(ptr) > TRACECMD_ERR_MSK)
