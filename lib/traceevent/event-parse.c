@@ -39,6 +39,27 @@
 #include "event-parse.h"
 #include "event-utils.h"
 
+/* True if the arithmetic type T is signed.  */
+# define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
+
+/* The maximum and minimum values for the integer type T.  These
+   macros have undefined behavior if T is signed and has padding bits.
+   If this is a problem for you, please let us know how to fix it for
+   your host.  */
+# define TYPE_MINIMUM(t) \
+   ((t) (! TYPE_SIGNED (t) \
+         ? (t) 0 \
+         : TYPE_SIGNED_MAGNITUDE (t) \
+         ? ~ (t) 0 \
+         : ~ TYPE_MAXIMUM (t)))
+# define TYPE_MAXIMUM(t) \
+   ((t) (! TYPE_SIGNED (t) \
+         ? (t) -1 \
+         : ((((t) 1 << (sizeof (t) * CHAR_BIT - 2)) - 1) * 2 + 1)))
+
+# ifndef ULLONG_MAX
+#  define ULLONG_MAX TYPE_MAXIMUM (unsigned long long)
+# endif
 static const char *input_buf;
 static unsigned long long input_buf_ptr;
 static unsigned long long input_buf_siz;
@@ -5425,6 +5446,7 @@ static bool is_timestamp_in_us(char *trace_clock, bool use_trace_clock)
 		return true;
 
 	if (!strcmp(trace_clock, "local") || !strcmp(trace_clock, "global")
+#define __USE_GNU 1
 	    || !strcmp(trace_clock, "uptime") || !strcmp(trace_clock, "perf"))
 		return true;
 
